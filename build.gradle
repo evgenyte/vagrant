@@ -12,33 +12,31 @@ repositories {
     jcenter()
 }
 
-version='1.0.5'  //version we need to change
 
-task increment doLast {
+task increment << {
     group 'Other'
     description 'increment version of gradlew properties'
-    def v=buildFile.getText().find(version)
+    def v=file("gradle.properties").getText().find(version)
     String minor=v.substring(v.lastIndexOf('.')+1) 
     int m=minor.toInteger()+1                      
-    String major=v.substring(0,v.length()-1)
-    String s=buildFile.getText().replaceFirst("version='$version'","version='"+major+m+"'")
-    buildFile.setText(s)
+    String major=v.substring(0,v.length()-1)       
+    String s="version="+major+m
+    println s
+    file("gradle.properties").setText(s) 
 }
 
 task sourcesForRelease(type: Copy) {
     from 'src/main/resources'
     into 'build/resources/main'
     doLast {
+        def v=file("gradle.properties").getText().find(version)
         def outputFile = file("$buildDir/resources/main/greeting.txt")
-        outputFile.write "Version: $version"
+        outputFile.write "Version:'"+v+"'"
         println "processing my task"
     }    
 }
 
 classes.dependsOn sourcesForRelease
-
-
-
 
 
 
